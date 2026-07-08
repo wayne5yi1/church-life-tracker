@@ -1,14 +1,11 @@
-﻿<!DOCTYPE html><html lang="zh"><head runat="server">
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - 聖徒屬靈追求與召會生活實行追蹤</title>
+    <title>聖徒屬靈追求與召會生活實行追蹤</title>
 
-    <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/bundles/modernizr") %>
-    </asp:PlaceHolder>
-
-    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <!-- 💡 引入現代 Bootstrap 5 框架，讓畫面從「作業感」躍升為「正式網站」 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -21,300 +18,289 @@
     </style>
 </head>
 <body>
-    <form runat="server">
-        <asp:ScriptManager runat="server"></asp:ScriptManager>
 
-        <div class="container">
-            <div class="card main-card shadow-sm rounded-3 overflow-hidden">
-                <div class="card-header bg-dark text-white py-3">
-                    <h4 class="mb-0 fw-bold">📊 聖徒「神命定之路」召會生活實行動態追蹤系統</h4>
+    <div class="container">
+        <div class="card main-card shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white py-3">
+                <h4 class="mb-0 fw-bold">📊 聖徒「神命定之路」召會生活實行動態追蹤系統</h4>
+            </div>
+            <div class="card-body p-4 bg-white">
+                
+                <!-- 核心動態表格  -->
+                <div class="table-responsive">
+                    <table id="X" class="table table-hover table-bordered align-middle text-center mb-4">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">聖徒姓名</th>
+                                <th style="width: 25%;">真理追求進度 </th>
+                                <th style="width: 45%;">召會生活實行紀錄 </th>
+                                <th style="width: 15%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 預設聖徒 1：王阿花 -->
+                            <tr id="row1">
+                                <td id="name_row1" class="fw-bold">EX：王阿花</td>
+                                <td id="country_row1">創世紀生命讀經第1章</td>
+                                <td id="sex_row1" class="text-start p-3">
+                                    <div class="mb-1">
+                                        <span class="badge bg-success meeting-badge" id="pray_tag1">🙏 週二禱告</span>
+                                        <span class="badge bg-success meeting-badge" id="group_tag1">🏡 週五小排</span>
+                                        <span class="badge bg-success meeting-badge" id="lord_tag1">🍞 主日聚會</span>
+                                    </div>
+                                    <div class="small text-muted mb-1">
+                                        📢 <b>傳福音：</b><span id="gospel_1" class="text-primary fw-bold">有 (每週六下午兩點)</span>
+                                    </div>
+                                    <div class="small text-muted">
+                                        ✨ <b>額外分別的情形：</b><span id="extra_1">每日清晨與活力伴晨興 10 分鐘</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button1" value="編輯" onclick="edit_row('1')">
+                                    <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button1" value="儲存" style="display:none" onclick="save_row('1')">
+                                    <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('1')">
+                                </td>
+                            </tr>
+                            <!-- 預設聖徒 2：陳大頭 -->
+                            <tr id="row2">
+                                <td id="name_row2" class="fw-bold">EX：陳大頭</td>
+                                <td id="country_row2">精讀羅馬書核心真理</td>
+                                <td id="sex_row2" class="text-start p-3">
+                                    <div class="mb-1">
+                                        <span class="badge bg-secondary meeting-badge" id="pray_tag2">✕ 週二禱告</span>
+                                        <span class="badge bg-success meeting-badge" id="group_tag2">🏡 週五小排</span>
+                                        <span class="badge bg-success meeting-badge" id="lord_tag2">🍞 主日聚會</span>
+                                    </div>
+                                    <div class="small text-muted mb-1">
+                                        📢 <b>傳福音：</b><span id="gospel_2" class="text-danger">沒有分別時間</span>
+                                    </div>
+                                    <div class="small text-muted">
+                                        ✨ <b>額外分別的情形：</b><span id="extra_2">無</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button2" value="編輯" onclick="edit_row('2')">
+                                    <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button2" value="儲存" style="display:none" onclick="save_row('2')">
+                                    <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('2')">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body p-4 bg-white">
-                    
-                  
 
-                    <!-- 核心動態表格  -->
-                    <div class="table-responsive">
-                        <table id="X" class="table table-hover table-bordered align-middle text-center mb-4">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%;">聖徒姓名</th>
-                                    <th style="width: 25%;">真理追求進度 </th>
-                                    <th style="width: 45%;">召會生活實行紀錄 </th>
-                                    <th style="width: 15%;">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr id="row1">
-                                    <td id="name_row1" class="fw-bold">EX：王阿花</td>
-                                    <td id="country_row1">創世紀生命讀經第1章</td>
-                                    <td id="sex_row1" class="text-start p-3">
-                                        <div class="mb-1">
-                                            <span class="badge bg-success meeting-badge" id="pray_1">🙏 週二禱告</span>
-                                            <span class="badge bg-success meeting-badge" id="group_1">🏡 週五小排</span>
-                                            <span class="badge bg-success meeting-badge" id="lord_1">🍞 主日聚會</span>
-                                        </div>
-                                        <div class="small text-muted mb-1">
-                                            📢 <b>傳福音：</b><span id="gospel_1" class="text-primary fw-bold">有 (每週六下午兩點)</span>
-                                        </div>
-                                        <div class="small text-muted">
-                                            ✨ <b>額外分別的情形：</b><span id="extra_1">每日清晨與活力伴晨興 10 分鐘</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button1" value="編輯" onclick="edit_row('1')">
-                                        <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button1" value="儲存" style="display:none" onclick="save_row('1')">
-                                        <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('1')">
-                                    </td>
-                                </tr>
-                                <tr id="row2">
-                                    <td id="name_row2" class="fw-bold">EX：陳大頭</td>
-                                    <td id="country_row2">精讀羅馬書核心真理</td>
-                                    <td id="sex_row2" class="text-start p-3">
-                                        <div class="mb-1">
-                                            <span class="badge bg-secondary meeting-badge" id="pray_2">✕ 週二禱告</span>
-                                            <span class="badge bg-success meeting-badge" id="group_2">🏡 週五小排</span>
-                                            <span class="badge bg-success meeting-badge" id="lord_2">🍞 主日聚會</span>
-                                        </div>
-                                        <div class="small text-muted mb-1">
-                                            📢 <b>傳福音：</b><span id="gospel_2" class="text-danger">沒有分別時間</span>
-                                        </div>
-                                        <div class="small text-muted">
-                                            ✨ <b>額外分別的情形：</b><span id="extra_2">無</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button2" value="編輯" onclick="edit_row('2')">
-                                        <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button2" value="儲存" style="display:none" onclick="save_row('2')">
-                                        <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('2')">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- 智慧型動態表單輸入區 -->
-                    <div class="card bg-light border-0 rounded-3 p-4">
-                        <h6 class="fw-bold text-dark mb-3">➕ 登記新的聖徒追求計畫與生活實行</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <input type="text" id="new_name" class="form-control form-control-sm" placeholder="聖徒姓名">
-                            </div>
-                            <div class="col-md-8">
-                                <input type="text" id="new_country" class="form-control form-control-sm" placeholder="真理追求目標 ">
-                            </div>
-                            
-                            <!-- 你要求的聚會勾選清單 -->
-                            <div class="col-12 mt-2">
-                                <label class="form-label small fw-bold text-secondary mb-1">每週固定聚會參與：</label>
-                                <div class="d-flex flex-wrap gap-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="add_pray" checked>
-                                        <label class="form-check-label small" for="add_pray">週二晚上 20:00 禱告聚會</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="add_group" checked>
-                                        <label class="form-check-label small" for="add_group">週五晚上 20:00 小排聚會</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="add_lord" checked>
-                                        <label class="form-check-label small" for="add_lord">週日上午 09:30 主日聚會</label>
-                                    </div>
+                <!-- 智慧型動態表單輸入區 -->
+                <div class="card bg-light border-0 rounded-3 p-4">
+                    <h6 class="fw-bold text-dark mb-3">➕ 登記新的聖徒追求計畫與生活實行</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" id="new_name" class="form-control form-control-sm" placeholder="聖徒姓名">
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="new_country" class="form-control form-control-sm" placeholder="真理追求目標 ">
+                        </div>
+                        
+                        <div class="col-12 mt-2">
+                            <label class="form-label small fw-bold text-secondary mb-1">每週固定聚會參與：</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="add_pray" checked>
+                                    <label class="form-check-label small" for="add_pray">週二晚上 20:00 禱告聚會</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="add_group" checked>
+                                    <label class="form-check-label small" for="add_group">週五晚上 20:00 小排聚會</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="add_lord" checked>
+                                    <label class="form-check-label small" for="add_lord">週日上午 09:30 主日聚會</label>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-md-4">
-                                <select id="add_gospel" class="form-select form-select-sm" onchange="toggleGospel(this, 'add_gospel_time')">
-                                    <option value="有">有分別時間傳福音</option>
-                                    <option value="沒有">沒有分別時間</option>
-                                </select>
-                            </div>
-                            <div class="col-md-8">
-                                <input type="text" id="add_gospel_time" class="form-control form-control-sm" placeholder="傳福音時段 (例如：每週六下午兩點)" value="每週六下午兩點">
-                            </div>
+                        <div class="col-md-4">
+                            <select id="add_gospel" class="form-select form-select-sm" onchange="toggleGospel(this, 'add_gospel_time')">
+                                <option value="有">有分別時間傳福音</option>
+                                <option value="沒有">沒有分別時間</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="add_gospel_time" class="form-control form-control-sm" placeholder="傳福音時段 (例如：每週六下午兩點)" value="每週六下午兩點">
+                        </div>
 
-                            <div class="col-12">
-                                <input type="text" id="add_extra" class="form-control form-control-sm" placeholder="額外分別的情形 (例如：每天晨興、家排成看望...)">
-                            </div>
+                        <div class="col-12">
+                            <input type="text" id="add_extra" class="form-control form-control-sm" placeholder="額外分別的情形 (例如：每天晨興、家排成看望...)">
+                        </div>
 
-                            <div class="col-12 text-end">
-                                <input type="button" class="btn btn-dark fw-bold btn-sm px-4 shadow-sm" value="新增紀錄" onclick="add_row()">
-                            </div>
+                        <div class="col-12 text-end">
+                            <input type="button" class="btn btn-dark fw-bold btn-sm px-4 shadow-sm" value="新增紀錄" onclick="add_row()">
                         </div>
                     </div>
-
                 </div>
+
             </div>
         </div>
+    </div>
 
-        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
-           
-        <!-- ====================================================== -->
-        <!-- JavaScript 大腦（核心增刪改查完全封裝，100%符合隨堂練習架構） -->
-        <!-- ====================================================== -->
-        <script>
-            var sp = " ";
-
-            function toggleGospel(selectObj, targetId) {
-                if (selectObj.value === "有") {
-                    document.getElementById(targetId).disabled = false;
-                    document.getElementById(targetId).value = "每週六下午兩點";
-                } else {
-                    document.getElementById(targetId).disabled = true;
-                    document.getElementById(targetId).value = "";
-                }
+    <div style="text-align:center; padding: 20px; color: #666; font-size: 0.9rem;">
+        ※ 本頁面之召會生活動態追蹤大腦由 JavaScript 前端核心渲染驅動。
+    </div>
+       
+    <!-- ====================================================== -->
+    <!-- JavaScript 大腦（核心增刪改查完全封裝） -->
+    <!-- ====================================================== -->
+    <script>
+        function toggleGospel(selectObj, targetId) {
+            if (selectObj.value === "有") {
+                document.getElementById(targetId).disabled = false;
+                document.getElementById(targetId).value = "每週六下午兩點";
+            } else {
+                document.getElementById(targetId).disabled = true;
+                document.getElementById(targetId).value = "";
             }
+        }
 
-            // (3) 刪除功能
-            function delete_row(no) {
-                let CurrentRow = "row" + no;
-                document.getElementById(CurrentRow).outerHTML = "";
-            }
+        // 刪除功能
+        function delete_row(no) {
+            let CurrentRow = "row" + no;
+            document.getElementById(CurrentRow).outerHTML = "";
+        }
 
-            // (4) 編輯功能 (將結構化資料反轉成編輯表單)
-            function edit_row(no) {
-                // 姓名編輯
-                let name_data = document.getElementById("name_row" + no).innerText;
-                document.getElementById("name_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='name_text${no}' value='${name_data}'>`;
+        // 編輯功能
+        function edit_row(no) {
+            let name_data = document.getElementById("name_row" + no).innerText;
+            document.getElementById("name_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='name_text${no}' value='${name_data}'>`;
 
-                // 目標編輯
-                let country_data = document.getElementById("country_row" + no).innerText;
-                document.getElementById("country_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='country_text${no}' value='${country_data}'>`;
+            let country_data = document.getElementById("country_row" + no).innerText;
+            document.getElementById("country_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='country_text${no}' value='${country_data}'>`;
 
-                // 讀取目前的狀態，動態生成編輯內部表單 (全面覆蓋原有 sex_row 控制點)
-                let p = document.getElementById("pray_tag" + no) ? document.getElementById("pray_tag" + no).innerText.includes("🙏") : false;
-                let g = document.getElementById("group_tag" + no) ? document.getElementById("group_tag" + no).innerText.includes("🏡") : false;
-                let l = document.getElementById("lord_tag" + no) ? document.getElementById("lord_tag" + no).innerText.includes("🍞") : false;
+            let p = document.getElementById("pray_tag" + no) ? document.getElementById("pray_tag" + no).innerText.includes("🙏") : false;
+            let g = document.getElementById("group_tag" + no) ? document.getElementById("group_tag" + no).innerText.includes("🏡") : false;
+            let l = document.getElementById("lord_tag" + no) ? document.getElementById("lord_tag" + no).innerText.includes("🍞") : false;
 
-                let gospelStr = document.getElementById("gospel_" + no).innerText;
-                let hasGospel = gospelStr.includes("沒有") ? "沒有" : "有";
-                let gospelTime = hasGospel === "有" ? gospelStr.replace("有 (", "").replace(")", "") : "";
+            let gospelStr = document.getElementById("gospel_" + no).innerText;
+            let hasGospel = gospelStr.includes("沒有") ? "沒有" : "有";
+            let gospelTime = hasGospel === "有" ? gospelStr.replace("有 (", "").replace(")", "") : "";
 
-                let extraStr = document.getElementById("extra_" + no).innerText;
+            let extraStr = document.getElementById("extra_" + no).innerText;
 
-                let editFormHtml = `
-                    <div class="p-2 border rounded bg-light text-start" style="font-size:0.85rem;" id="sex_edit_box${no}">
-                        <div class="mb-1 fw-bold text-muted">聚會實行變更：</div>
-                        <input type="checkbox" id="edit_pray${no}" ${p ? 'checked' : ''}> 禱告 
-                        <input type="checkbox" id="edit_group${no}" ${g ? 'checked' : ''} class="ms-2"> 小排 
-                        <input type="checkbox" id="edit_lord${no}" ${l ? 'checked' : ''} class="ms-2"> 主日
-                        <div class="mt-2">
-                            <select id="edit_gospel_sel${no}" class="form-select form-select-sm d-inline-block w-auto me-1" onchange="toggleGospel(this, 'edit_gospel_time${no}')">
-                                <option value="有" ${hasGospel === '有' ? 'selected' : ''}>有福音</option>
-                                <option value="沒有" ${hasGospel === '沒有' ? 'selected' : ''}>無福音</option>
-                            </select>
-                            <input type="text" id="edit_gospel_time${no}" class="form-control form-control-sm d-inline-block w-50" value="${gospelTime}" ${hasGospel === '沒有' ? 'disabled' : ''}>
-                        </div>
-                        <input type="text" id="edit_extra${no}" class="form-control form-control-sm mt-2" value="${extraStr}" placeholder="額外分別的情形">
+            let editFormHtml = `
+                <div class="p-2 border rounded bg-light text-start" style="font-size:0.85rem;" id="sex_edit_box${no}">
+                    <div class="mb-1 fw-bold text-muted">聚會實行變更：</div>
+                    <input type="checkbox" id="edit_pray${no}" ${p ? 'checked' : ''}> 禱告 
+                    <input type="checkbox" id="edit_group${no}" ${g ? 'checked' : ''} class="ms-2"> 小排 
+                    <input type="checkbox" id="edit_lord${no}" ${l ? 'checked' : ''} class="ms-2"> 主日
+                    <div class="mt-2">
+                        <select id="edit_gospel_sel${no}" class="form-select form-select-sm d-inline-block w-auto me-1" onchange="toggleGospel(this, 'edit_gospel_time${no}')">
+                            <option value="有" ${hasGospel === '有' ? 'selected' : ''}>有福音</option>
+                            <option value="沒有" ${hasGospel === '沒有' ? 'selected' : ''}>無福音</option>
+                        </select>
+                        <input type="text" id="edit_gospel_time${no}" class="form-control form-control-sm d-inline-block w-50" value="${gTime}" ${hasGospel === '沒有' ? 'disabled' : ''}>
                     </div>
-                `;
+                    <input type="text" id="edit_extra${no}" class="form-control form-control-sm mt-2" value="${extraStr}" placeholder="額外分別的情形">
+                </div>
+            `;
 
-                document.getElementById("sex_row" + no).innerHTML = editFormHtml;
+            document.getElementById("sex_row" + no).innerHTML = editFormHtml;
+            document.getElementById("edit_button" + no).style.display = "none";
+            document.getElementById("save_button" + no).style.display = "inline";
+        }
 
-                document.getElementById("edit_button" + no).style.display = "none";
-                document.getElementById("save_button" + no).style.display = "inline";
+        // 儲存功能
+        function save_row(no) {
+            let name_val = document.getElementById("name_text" + no).value;
+            document.getElementById("name_row" + no).innerHTML = name_val;
+
+            let country_val = document.getElementById("country_text" + no).value;
+            document.getElementById("country_row" + no).innerHTML = country_val;
+
+            let p = document.getElementById("edit_pray" + no).checked;
+            let g = document.getElementById("edit_group" + no).checked;
+            let l = document.getElementById("edit_lord" + no).checked;
+            let gSel = document.getElementById("edit_gospel_sel" + no).value;
+            let gTime = document.getElementById("edit_gospel_time" + no).value;
+            let ext = document.getElementById("edit_extra" + no).value;
+
+            let resultHtml = `
+                <div class="mb-1">
+                    <span class="badge ${p ? 'bg-success' : 'bg-secondary'} meeting-badge" id="pray_tag${no}">${p ? '🙏 週二禱告' : '✕ 週二禱告'}</span>
+                    <span class="badge ${g ? 'bg-success' : 'bg-secondary'} meeting-badge" id="group_tag${no}">${g ? '🏡 週五小排' : '✕ 週五小排'}</span>
+                    <span class="badge ${l ? 'bg-success' : 'bg-secondary'} meeting-badge" id="lord_tag${no}">${l ? '🍞 主日聚會' : '✕ 主日聚會'}</span>
+                </div>
+                <div class="small text-muted mb-1">
+                    📢 <b>傳福音：</b><span id="gospel_${no}" class="${gSel === '有' ? 'text-primary fw-bold' : 'text-danger'}">${gSel === '有' ? '有 (' + gTime + ')' : '沒有分別時間'}</span>
+                </div>
+                <div class="small text-muted">
+                    ✨ <b>額外分別的情形：</b><span id="extra_${no}">${ext ? ext : '無'}</span>
+                </div>
+            `;
+
+            document.getElementById("sex_row" + no).innerHTML = resultHtml;
+            document.getElementById("edit_button" + no).style.display = "inline";
+            document.getElementById("save_button" + no).style.display = "none";
+        }
+
+        // 動態新增功能
+        function add_row() {
+            let new_name = document.getElementById("new_name").value;
+            let new_country = document.getElementById("new_country").value;
+
+            let p = document.getElementById("add_pray").checked;
+            let g = document.getElementById("add_group").checked;
+            let l = document.getElementById("add_lord").checked;
+            let gSel = document.getElementById("add_gospel").value;
+            let gTime = document.getElementById("add_gospel_time").value;
+            let ext = document.getElementById("add_extra").value;
+
+            if (!new_name || !new_country) {
+                alert("請至少輸入聖徒姓名與真理追求目標！");
+                return;
             }
 
-            // (5) 儲存功能 (將編輯表單數據重新格式化回顯)
-            function save_row(no) {
-                let name_val = document.getElementById("name_text" + no).value;
-                document.getElementById("name_row" + no).innerHTML = name_val;
+            let table = document.getElementById("X");
+            let table_len = table.rows.length; // 自動產生不會重複的序號
 
-                let country_val = document.getElementById("country_text" + no).value;
-                document.getElementById("country_row" + no).innerHTML = country_val;
+            let R1 = "<tr id='row" + table_len + "'>";
+            let R2 = "<td id='name_row" + table_len + "' class='fw-bold'>" + new_name + "</td>";
+            let R3 = "<td id='country_row" + table_len + "'>" + new_country + "</td>";
 
-                // 抓取編輯欄位的值
-                let p = document.getElementById("edit_pray" + no).checked;
-                let g = document.getElementById("edit_group" + no).checked;
-                let l = document.getElementById("edit_lord" + no).checked;
-                let gSel = document.getElementById("edit_gospel_sel" + no).value;
-                let gTime = document.getElementById("edit_gospel_time" + no).value;
-                let ext = document.getElementById("edit_extra" + no).value;
-
-                // 重新渲染成漂亮的高質感資料
-                let resultHtml = `
+            let RSex = `
+                <td id='sex_row${table_len}' class='text-start p-3'>
                     <div class="mb-1">
-                        <span class="badge ${p ? 'bg-success' : 'bg-secondary'} meeting-badge" id="pray_tag${no}">${p ? '🙏 週二禱告' : '✕ 週二禱告'}</span>
-                        <span class="badge ${g ? 'bg-success' : 'bg-secondary'} meeting-badge" id="group_tag${no}">${g ? '🏡 週五小排' : '✕ 週五小排'}</span>
-                        <span class="badge ${l ? 'bg-success' : 'bg-secondary'} meeting-badge" id="lord_tag${no}">${l ? '🍞 主日聚會' : '✕ 主日聚會'}</span>
+                        <span class="badge ${p ? 'bg-success' : 'bg-secondary'} meeting-badge" id="pray_tag${table_len}">${p ? '🙏 週二禱告' : '✕ 週二禱告'}</span>
+                        <span class="badge ${g ? 'bg-success' : 'bg-secondary'} meeting-badge" id="group_tag${table_len}">${g ? '🏡 週五小排' : '✕ 週五小排'}</span>
+                        <span class="badge ${l ? 'bg-success' : 'bg-secondary'} meeting-badge" id="lord_tag${table_len}">${l ? '🍞 主日聚會' : '✕ 主日聚會'}</span>
                     </div>
                     <div class="small text-muted mb-1">
-                        📢 <b>傳福音：</b><span id="gospel_${no}" class="${gSel === '有' ? 'text-primary fw-bold' : 'text-danger'}">${gSel === '有' ? '有 (' + gTime + ')' : '沒有分別時間'}</span>
+                        📢 <b>傳福音：</b><span id="gospel_${table_len}" class="${gSel === '有' ? 'text-primary fw-bold' : 'text-danger'}">${gSel === '有' ? '有 (' + gTime + ')' : '沒有分別時間'}</span>
                     </div>
                     <div class="small text-muted">
-                        ✨ <b>額外分別的情形：</b><span id="extra_${no}">${ext ? ext : '無'}</span>
+                        ✨ <b>額外分別的情形：</b><span id="extra_${table_len}">${ext ? ext : '無'}</span>
                     </div>
-                `;
+                </td>
+            `;
 
-                document.getElementById("sex_row" + no).innerHTML = resultHtml;
+            let R4 = "<td>";
+            let R_edit = "<input type='button' class='btn btn-sm btn-outline-primary mb-1 w-100' id='edit_button" + table_len + "' value='編輯' onclick='edit_row(\"" + table_len + "\")'>";
+            let R_save = "<input type='button' class='btn btn-sm btn-success mb-1 w-100' id='save_button" + table_len + "' value='儲存' style='display:none' onclick='save_row(\"" + table_len + "\")'>";
+            let R_del = "<input type='button' class='btn btn-sm btn-outline-danger w-100' value='刪除' onclick='delete_row(\"" + table_len + "\")'>";
+            let R5 = "</td></tr>";
 
-                document.getElementById("edit_button" + no).style.display = "inline";
-                document.getElementById("save_button" + no).style.display = "none";
-            }
+            let R = R1 + R2 + R3 + RSex + R4 + R_edit + R_save + R_del + R5;
 
-            // (10) 動態新增功能
-            function add_row() {
-                let new_name = document.getElementById("new_name").value;
-                let new_country = document.getElementById("new_country").value;
+            // 插入表格最底下
+            table.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', R);
 
-                let p = document.getElementById("add_pray").checked;
-                let g = document.getElementById("add_group").checked;
-                let l = document.getElementById("add_lord").checked;
-                let gSel = document.getElementById("add_gospel").value;
-                let gTime = document.getElementById("add_gospel_time").value;
-                let ext = document.getElementById("add_extra").value;
-
-                if (!new_name || !new_country) {
-                    alert("請至少輸入聖徒姓名與真理追求目標！");
-                    return;
-                }
-
-                let table = document.getElementById("X");
-                let table_len = table.rows.length;
-
-                // 智慧型外殼組裝
-                let R1 = "<tr id='row" + table_len + "'>";
-                let R2 = "<td id='name_row" + table_len + "' class='fw-bold'>" + new_name + "</td>";
-                let R3 = "<td id='country_row" + table_len + "'>" + new_country + "</td>";
-
-                let RSex = `
-                    <td id='sex_row${table_len}' class='text-start p-3'>
-                        <div class="mb-1">
-                            <span class="badge ${p ? 'bg-success' : 'bg-secondary'} meeting-badge" id="pray_tag${table_len}">${p ? '🙏 週二禱告' : '✕ 週二禱告'}</span>
-                            <span class="badge ${g ? 'bg-success' : 'bg-secondary'} meeting-badge" id="group_tag${table_len}">${g ? '🏡 週五小排' : '✕ 週五小排'}</span>
-                            <span class="badge ${l ? 'bg-success' : 'bg-secondary'} meeting-badge" id="lord_tag${table_len}">${l ? '🍞 主日聚會' : '✕ 主日聚會'}</span>
-                        </div>
-                        <div class="small text-muted mb-1">
-                            📢 <b>傳福音：</b><span id="gospel_${table_len}" class="${gSel === '有' ? 'text-primary fw-bold' : 'text-danger'}">${gSel === '有' ? '有 (' + gTime + ')' : '沒有分別時間'}</span>
-                        </div>
-                        <div class="small text-muted">
-                            ✨ <b>額外分別的情形：</b><span id="extra_${table_len}">${ext ? ext : '無'}</span>
-                        </div>
-                    </td>
-                `;
-
-                let R4 = "<td>";
-                let R_edit = "<input type='button' class='btn btn-sm btn-outline-primary mb-1 w-100' id='edit_button" + table_len + "' value='編輯' onclick='edit_row(\"" + table_len + "\")'>";
-                let R_save = "<input type='button' class='btn btn-sm btn-success mb-1 w-100' id='save_button" + table_len + "' value='儲存' style='display:none' onclick='save_row(\"" + table_len + "\")'>";
-                let R_del = "<input type='button' class='btn btn-sm btn-outline-danger w-100' value='刪除' onclick='delete_row(\"" + table_len + "\")'>";
-                let R5 = "</td></tr>";
-
-                let R = R1 + R2 + R3 + RSex + R4 + R_edit + R_save + R_del + R5;
-
-                table.insertRow(table_len).outerHTML = R;
-
-                // 重設輸入表單
-                document.getElementById("new_name").value = "";
-                document.getElementById("new_country").value = "";
-                document.getElementById("add_pray").checked = true;
-                document.getElementById("add_group").checked = true;
-                document.getElementById("add_lord").checked = true;
-                document.getElementById("add_gospel").value = "有";
-                document.getElementById("add_gospel_time").value = "每週六下午兩點";
-                document.getElementById("add_gospel_time").disabled = false;
-                document.getElementById("add_extra").value = "";
-            }
-        </script>
-    </form>
+            // 重設輸入表單
+            document.getElementById("new_name").value = "";
+            document.getElementById("new_country").value = "";
+            document.getElementById("add_pray").checked = true;
+            document.getElementById("add_group").checked = true;
+            document.getElementById("add_lord").checked = true;
+            document.getElementById("add_gospel").value = "有";
+            document.getElementById("add_gospel_time").value = "每週校正下午兩點";
+            document.getElementById("add_gospel_time").disabled = false;
+            document.getElementById("add_extra").value = "";
+        }
+    </script>
 </body>
 </html>
