@@ -1,7 +1,132 @@
-﻿
-<asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-    <!-- 💡 完美解決方案：這裡已完全清空舊的 ASP.NET 架構介紹 -->
-    <div style="text-align:center; padding: 20px; color: #666; font-size: 0.9rem;">
-        ※ 本頁面之召會生活動態追蹤大腦由 Site.Master 核心渲染驅動。
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>聖徒屬靈追求與召會生活實行追蹤</title>
+
+    <!-- 引入 Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body { background-color: #f4f6f9; font-family: system-ui, -apple-system, sans-serif; }
+        .main-card { max-width: 950px; margin: 40px auto; border: none; }
+        .table th { background-color: #212529; color: white; vertical-align: middle; }
+        .meeting-badge { font-size: 0.8rem; margin-right: 3px; display: inline-block; margin-bottom: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card main-card shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white py-3">
+                <h4 class="mb-0 fw-bold">📊 聖徒「神命定之路」召會生活實行動態追蹤系統</h4>
+            </div>
+            <div class="card-body p-4 bg-white">
+                
+                <!-- 核心動態表格 -->
+                <div class="table-responsive">
+                    <table id="X" class="table table-hover table-bordered align-middle text-center mb-4">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">聖徒姓名</th>
+                                <th style="width: 25%;">真理追求進度</th>
+                                <th style="width: 45%;">召會生活實行紀錄</th>
+                                <th style="width: 15%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="row1">
+                                <td id="name_row1" class="fw-bold">王阿花</td>
+                                <td id="country_row1">創世紀生命讀經第1章</td>
+                                <td id="sex_row1" class="text-start p-3">
+                                    <div class="mb-1">
+                                        <span class="badge bg-success meeting-badge" id="pray_tag1">🙏 週二禱告</span>
+                                        <span class="badge bg-success meeting-badge" id="group_tag1">🏡 週五小排</span>
+                                        <span class="badge bg-success meeting-badge" id="lord_tag1">🍞 主日聚會</span>
+                                    </div>
+                                    <div class="small text-muted mb-1">📢 <b>傳福音：</b><span id="gospel_1" class="text-primary fw-bold">有 (每週六下午兩點)</span></div>
+                                    <div class="small text-muted">✨ <b>額外分別的情形：</b><span id="extra_1">每日清晨與活力伴晨興 10 分鐘</span></div>
+                                </td>
+                                <td>
+                                    <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button1" value="編輯" onclick="edit_row('1')">
+                                    <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button1" value="儲存" style="display:none" onclick="save_row('1')">
+                                    <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('1')">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 智慧型動態表單輸入區 -->
+                <div class="card bg-light border-0 rounded-3 p-4">
+                    <h6 class="fw-bold text-dark mb-3">➕ 登記新的聖徒追求計畫與生活實行</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4"><input type="text" id="new_name" class="form-control form-control-sm" placeholder="聖徒姓名"></div>
+                        <div class="col-md-8"><input type="text" id="new_country" class="form-control form-control-sm" placeholder="真理追求目標"></div>
+                        <div class="col-12 mt-2">
+                            <label class="form-label small fw-bold text-secondary mb-1">每週固定聚會參與：</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="add_pray" checked><label class="form-check-label small" for="add_pray">週二禱告</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="add_group" checked><label class="form-check-label small" for="add_group">週五小排</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" id="add_lord" checked><label class="form-check-label small" for="add_lord">主日聚會</label></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="add_gospel" class="form-select form-select-sm" onchange="toggleGospel(this, 'add_gospel_time')">
+                                <option value="有">有分別時間傳福音</option>
+                                <option value="沒有">沒有分別時間</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8"><input type="text" id="add_gospel_time" class="form-control form-control-sm" placeholder="傳福音時段" value="每週六下午兩點"></div>
+                        <div class="col-12"><input type="text" id="add_extra" class="form-control form-control-sm" placeholder="額外分別的情形"></div>
+                        <div class="col-12 text-end"><input type="button" class="btn btn-dark fw-bold btn-sm px-4 shadow-sm" value="新增紀錄" onclick="add_row()"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</asp:Content>
+
+    <script>
+        function toggleGospel(selectObj, targetId) {
+            let el = document.getElementById(targetId);
+            el.disabled = (selectObj.value === "沒有");
+            if (el.disabled) el.value = "";
+        }
+        function delete_row(no) { document.getElementById("row" + no).remove(); }
+        
+        function edit_row(no) {
+            let name_data = document.getElementById("name_row" + no).innerText;
+            let country_data = document.getElementById("country_row" + no).innerText;
+            document.getElementById("name_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='name_text${no}' value='${name_data}'>`;
+            document.getElementById("country_row" + no).innerHTML = `<input type='text' class='form-control form-control-sm' id='country_text${no}' value='${country_data}'>`;
+            
+            document.getElementById("edit_button" + no).style.display = "none";
+            document.getElementById("save_button" + no).style.display = "inline";
+        }
+
+        function save_row(no) {
+            let name_val = document.getElementById("name_text" + no).value;
+            let country_val = document.getElementById("country_text" + no).value;
+            document.getElementById("name_row" + no).innerText = name_val;
+            document.getElementById("country_row" + no).innerText = country_val;
+            
+            document.getElementById("edit_button" + no).style.display = "inline";
+            document.getElementById("save_button" + no).style.display = "none";
+        }
+
+        function add_row() {
+            let table = document.getElementById("X").getElementsByTagName('tbody')[0];
+            let newRow = table.insertRow();
+            newRow.id = "row" + Date.now();
+            newRow.innerHTML = `
+                <td class='fw-bold'>${document.getElementById("new_name").value}</td>
+                <td>${document.getElementById("new_country").value}</td>
+                <td class='text-start p-3'>已新增</td>
+                <td><button class='btn btn-sm btn-outline-danger w-100' onclick='this.parentElement.parentElement.remove()'>刪除</button></td>
+            `;
+        }
+    </script>
+</body>
+</html>
