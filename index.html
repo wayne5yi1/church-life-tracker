@@ -10,6 +10,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- 🔥 Firebase：用來做帳號登入 + 雲端資料庫，讓資料能跨裝置同步 -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        // ⚠️ 請將以下設定換成你自己 Firebase 專案的設定值（步驟見交談中的說明）
+        const firebaseConfig = {
+            apiKey: "AIzaSyARszpc7JCoc-bLk9vIgJVFYhgeuhumBnw",
+            authDomain: "church-life-tracker.firebaseapp.com",
+            projectId: "church-life-tracker",
+            storageBucket: "church-life-tracker.firebasestorage.app",
+            messagingSenderId: "838242346420",
+            appId: "1:838242346420:web:9eafdbf90f2afdd3a0bee1"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        // 帳號登入時，會把使用者輸入的「帳號」自動接上這個假網域，組成 Firebase 需要的 email 格式
+        const FAKE_EMAIL_DOMAIN = "@church-tracker.local";
+    </script>
+
     <style>
         body { background-color: #f4f6f9; font-family: system-ui, -apple-system, sans-serif; }
         .main-card { max-width: 950px; margin: 40px auto; border: none; }
@@ -19,7 +40,33 @@
 </head>
 <body>
 
-    <div class="container">
+    <!-- 🔐 登入畫面：登入成功前，看不到任何追蹤資料 -->
+    <div class="container" id="login-container">
+        <div class="card main-card shadow-sm rounded-3 overflow-hidden" style="max-width: 400px;">
+            <div class="card-header bg-dark text-white py-3">
+                <h5 class="mb-0 fw-bold">🔐 登入</h5>
+            </div>
+            <div class="card-body p-4 bg-white">
+                <p class="text-muted small">第一次使用嗎？直接輸入想要的帳號密碼按「登入」，系統會自動幫你建立帳號。</p>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">帳號</label>
+                    <input type="text" id="login_username" class="form-control" placeholder="自訂一組帳號名稱" autocomplete="username">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">密碼</label>
+                    <input type="password" id="login_password" class="form-control" placeholder="至少 6 個字元" autocomplete="current-password">
+                </div>
+                <div id="login_error" class="text-danger small mb-2" style="display:none;"></div>
+                <button class="btn btn-dark w-100 fw-bold" onclick="handleLogin()" id="login_btn">登入</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="app-container" style="display:none;">
+        <div class="d-flex justify-content-end mb-2" style="max-width: 950px; margin: 0 auto;">
+            <span class="small text-muted me-3 align-self-center" id="current-user-label"></span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="handleLogout()">登出</button>
+        </div>
         <div class="card main-card shadow-sm rounded-3 overflow-hidden">
             <div class="card-header bg-dark text-white py-3">
                 <h4 class="mb-0 fw-bold">📊 聖徒「神命定之路」召會生活實行動態追蹤系統</h4>
@@ -149,6 +196,146 @@
     <!-- JavaScript 大腦（核心增刪改查完全封裝） -->
     <!-- ====================================================== -->
     <script>
+        // ============ 登入 / 登出 ============
+        function handleLogin() {
+            const username = document.getElementById("login_username").value.trim();
+            const password = document.getElementById("login_password").value;
+            const errorBox = document.getElementById("login_error");
+            errorBox.style.display = "none";
+
+            if (!username || !password) {
+                errorBox.textContent = "請輸入帳號與密碼";
+                errorBox.style.display = "block";
+                return;
+            }
+            if (password.length < 6) {
+                errorBox.textContent = "密碼至少需要 6 個字元";
+                errorBox.style.display = "block";
+                return;
+            }
+
+            const email = username + FAKE_EMAIL_DOMAIN;
+            document.getElementById("login_btn").disabled = true;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .catch((err) => {
+                    if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+                        // 第一次使用，自動建立帳號
+                        return auth.createUserWithEmailAndPassword(email, password);
+                    }
+                    throw err;
+                })
+                .catch((err) => {
+                    errorBox.textContent = "登入失敗：" + (err.code === "auth/wrong-password" ? "密碼錯誤" : err.message);
+                    errorBox.style.display = "block";
+                })
+                .finally(() => {
+                    document.getElementById("login_btn").disabled = false;
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut();
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("app-container").style.display = "block";
+                document.getElementById("current-user-label").textContent =
+                    "登入身分：" + user.email.replace(FAKE_EMAIL_DOMAIN, "");
+                loadData();
+            } else {
+                document.getElementById("login-container").style.display = "block";
+                document.getElementById("app-container").style.display = "none";
+            }
+        });
+
+        // ============ 雲端資料存取 ============
+        function getUserDocRef() {
+            const user = auth.currentUser;
+            if (!user) return null;
+            return db.collection("trackerData").doc(user.uid);
+        }
+
+        function serializeTable() {
+            const rows = [];
+            document.querySelectorAll("#X tbody tr").forEach((tr) => {
+                const no = tr.id.replace("row", "");
+                const name = document.getElementById("name_row" + no).textContent.trim();
+                const goal = document.getElementById("country_row" + no).textContent.trim();
+                const prayTag = document.getElementById("pray_tag" + no);
+                const groupTag = document.getElementById("group_tag" + no);
+                const lordTag = document.getElementById("lord_tag" + no);
+                const pray = prayTag ? prayTag.textContent.includes("🙏") : false;
+                const group = groupTag ? groupTag.textContent.includes("🏡") : false;
+                const lord = lordTag ? lordTag.textContent.includes("🍞") : false;
+                const gospelElem = document.getElementById("gospel_" + no);
+                const gospelText = gospelElem ? gospelElem.textContent.trim() : "";
+                const hasGospel = gospelText.includes("沒有") ? "沒有" : "有";
+                const gospelTime = hasGospel === "有" ? gospelText.replace(/^有\s*\(/, "").replace(/\)$/, "") : "";
+                const extraElem = document.getElementById("extra_" + no);
+                const extra = extraElem ? extraElem.textContent.trim() : "";
+                rows.push({ name, goal, pray, group, lord, gospel: hasGospel, gospelTime, extra });
+            });
+            return rows;
+        }
+
+        function buildRowHtml(no, d) {
+            return `
+                <tr id="row${no}">
+                    <td id="name_row${no}" class="fw-bold">${escapeHtml(d.name)}</td>
+                    <td id="country_row${no}">${escapeHtml(d.goal)}</td>
+                    <td id="sex_row${no}" class="text-start p-3">
+                        <div class="mb-1">
+                            <span class="badge ${d.pray ? "bg-success" : "bg-secondary"} meeting-badge" id="pray_tag${no}">${d.pray ? "🙏 週二禱告" : "✕ 週二禱告"}</span>
+                            <span class="badge ${d.group ? "bg-success" : "bg-secondary"} meeting-badge" id="group_tag${no}">${d.group ? "🏡 週五小排" : "✕ 週五小排"}</span>
+                            <span class="badge ${d.lord ? "bg-success" : "bg-secondary"} meeting-badge" id="lord_tag${no}">${d.lord ? "🍞 主日聚會" : "✕ 主日聚會"}</span>
+                        </div>
+                        <div class="small text-muted mb-1">
+                            📢 <b>傳福音：</b><span id="gospel_${no}" class="${d.gospel === "有" ? "text-primary fw-bold" : "text-danger"}">${d.gospel === "有" ? "有 (" + escapeHtml(d.gospelTime) + ")" : "沒有分別時間"}</span>
+                        </div>
+                        <div class="small text-muted">
+                            ✨ <b>額外分別的情形：</b><span id="extra_${no}">${d.extra ? escapeHtml(d.extra) : "無"}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button${no}" value="編輯" onclick="edit_row('${no}')">
+                        <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button${no}" value="儲存" style="display:none" onclick="save_row('${no}')">
+                        <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('${no}')">
+                    </td>
+                </tr>
+            `;
+        }
+
+        function renderTable(rows) {
+            const tbody = document.querySelector("#X tbody");
+            tbody.innerHTML = "";
+            rows.forEach((d, idx) => {
+                tbody.insertAdjacentHTML("beforeend", buildRowHtml(idx + 1, d));
+            });
+        }
+
+        function saveData() {
+            const docRef = getUserDocRef();
+            if (!docRef) return;
+            docRef.set({ rows: serializeTable(), updatedAt: new Date().toISOString() })
+                .catch((err) => console.error("儲存失敗：", err));
+        }
+
+        function loadData() {
+            const docRef = getUserDocRef();
+            if (!docRef) return;
+            docRef.get().then((doc) => {
+                if (doc.exists && Array.isArray(doc.data().rows) && doc.data().rows.length > 0) {
+                    renderTable(doc.data().rows);
+                } else {
+                    // 這個帳號第一次使用，還沒有雲端資料，就用預設的示範資料，並立刻存一份上去
+                    saveData();
+                }
+            }).catch((err) => console.error("讀取失敗：", err));
+        }
+
         function toggleGospel(selectObj, targetId) {
             const target = document.getElementById(targetId);
             if (!target) return;
@@ -186,6 +373,7 @@
         function delete_row(no) {
             const row = document.getElementById("row" + no);
             if (row) row.remove();
+            saveData();
         }
 
         function edit_row(no) {
@@ -270,6 +458,7 @@
             sexCell.innerHTML = resultHtml;
             document.getElementById("edit_button" + no).style.display = "inline";
             document.getElementById("save_button" + no).style.display = "none";
+            saveData();
         }
 
         function add_row() {
@@ -327,6 +516,7 @@
             document.getElementById("add_gospel_time").value = "每週六下午兩點";
             document.getElementById("add_gospel_time").disabled = false;
             document.getElementById("add_extra").value = "";
+            saveData();
         }
     </script>
 </body>
