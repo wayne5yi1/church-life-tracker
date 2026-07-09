@@ -72,7 +72,20 @@
                 <h4 class="mb-0 fw-bold">📊 聖徒「神命定之路」召會生活實行動態追蹤系統</h4>
             </div>
             <div class="card-body p-4 bg-white">
-                
+
+                <!-- 📅 週別導覽列 -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 p-2 bg-light rounded-3 border">
+                    <div>
+                        <span class="fw-bold" id="week-range-label">📅 載入中...</span>
+                        <span class="badge bg-warning text-dark ms-2" id="history-badge" style="display:none;">🕒 歷史紀錄（唯讀，無法編輯）</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small text-muted mb-0">檢視週別：</label>
+                        <select id="week_selector" class="form-select form-select-sm" style="width:auto;" onchange="onWeekSelectChange()"></select>
+                        <button class="btn btn-sm btn-outline-dark" id="back-to-current-btn" style="display:none;" onclick="goToCurrentWeek()">回到本週</button>
+                    </div>
+                </div>
+
                 <!-- 核心動態表格  -->
                 <div class="table-responsive">
                     <table id="X" class="table table-hover table-bordered align-middle text-center mb-4">
@@ -136,7 +149,7 @@
                 </div>
 
                 <!-- 智慧型動態表單輸入區 -->
-                <div class="card bg-light border-0 rounded-3 p-4">
+                <div class="card bg-light border-0 rounded-3 p-4" id="add-member-panel">
                     <h6 class="fw-bold text-dark mb-3">➕ 登記新的聖徒追求計畫與生活實行</h6>
                     <div class="row g-3">
                         <div class="col-md-4">
@@ -244,18 +257,81 @@
                 document.getElementById("app-container").style.display = "block";
                 document.getElementById("current-user-label").textContent =
                     "登入身分：" + user.email.replace(FAKE_EMAIL_DOMAIN, "");
-                loadData();
+                initApp();
             } else {
                 document.getElementById("login-container").style.display = "block";
                 document.getElementById("app-container").style.display = "none";
             }
         });
 
+        // ============ 週別計算（台灣時間，週日為一週開頭） ============
+        function getTaipeiNow() {
+            // 用台灣時區字串重建一個 Date，讓後續的年/月/日/星期計算都以台灣時間為準
+            const taipeiStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Taipei" });
+            return new Date(taipeiStr);
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() - d.getDay()); // getDay(): 0 = 週日
+            return d;
+        }
+
+        function formatDateId(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${dd}`;
+        }
+
+        function formatDateDisplay(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${y}/${m}/${dd}`;
+        }
+
+        const WEEKDAY_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
+
+        let currentWeekId = null;   // 本週（依台灣時間、週日開頭）的 ID，例如 2026-07-05
+        let currentWeekStart = null;
+        let currentWeekEnd = null;
+        let viewingWeekId = null;   // 目前畫面上顯示的是哪一週
+        let isViewingHistory = false;
+
+        function computeCurrentWeek() {
+            currentWeekStart = getWeekStart(getTaipeiNow());
+            currentWeekEnd = new Date(currentWeekStart);
+            currentWeekEnd.setDate(currentWeekEnd.getDate() + 6);
+            currentWeekId = formatDateId(currentWeekStart);
+        }
+
+        function updateWeekRangeLabel() {
+            const start = viewingWeekId === currentWeekId ? currentWeekStart : parseWeekId(viewingWeekId);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 6);
+            const label = `📅 ${formatDateDisplay(start)}(${WEEKDAY_LABELS[0]}) ~ ${formatDateDisplay(end)}(${WEEKDAY_LABELS[6]})　（台灣時間）`;
+            document.getElementById("week-range-label").textContent =
+                (viewingWeekId === currentWeekId ? "本週　" : "歷史週別　") + label;
+        }
+
+        function parseWeekId(weekId) {
+            const [y, m, d] = weekId.split("-").map(Number);
+            return new Date(y, m - 1, d);
+        }
+
         // ============ 雲端資料存取 ============
-        function getUserDocRef() {
+        function getUserRootRef() {
             const user = auth.currentUser;
             if (!user) return null;
             return db.collection("trackerData").doc(user.uid);
+        }
+
+        function getWeekDocRef(weekId) {
+            const root = getUserRootRef();
+            if (!root) return null;
+            return root.collection("weeks").doc(weekId);
         }
 
         function serializeTable() {
@@ -281,7 +357,14 @@
             return rows;
         }
 
-        function buildRowHtml(no, d) {
+        function buildRowHtml(no, d, readOnly) {
+            const actionsHtml = readOnly
+                ? `<span class="text-muted small">－</span>`
+                : `
+                    <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button${no}" value="編輯" onclick="edit_row('${no}')">
+                    <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button${no}" value="儲存" style="display:none" onclick="save_row('${no}')">
+                    <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('${no}')">
+                `;
             return `
                 <tr id="row${no}">
                     <td id="name_row${no}" class="fw-bold">${escapeHtml(d.name)}</td>
@@ -299,41 +382,153 @@
                             ✨ <b>額外分別的情形：</b><span id="extra_${no}">${d.extra ? escapeHtml(d.extra) : "無"}</span>
                         </div>
                     </td>
-                    <td>
-                        <input type="button" class="btn btn-sm btn-outline-primary mb-1 w-100" id="edit_button${no}" value="編輯" onclick="edit_row('${no}')">
-                        <input type="button" class="btn btn-sm btn-success mb-1 w-100" id="save_button${no}" value="儲存" style="display:none" onclick="save_row('${no}')">
-                        <input type="button" class="btn btn-sm btn-outline-danger w-100" value="刪除" onclick="delete_row('${no}')">
-                    </td>
+                    <td>${actionsHtml}</td>
                 </tr>
             `;
         }
 
-        function renderTable(rows) {
+        function renderTable(rows, readOnly) {
             const tbody = document.querySelector("#X tbody");
             tbody.innerHTML = "";
             rows.forEach((d, idx) => {
-                tbody.insertAdjacentHTML("beforeend", buildRowHtml(idx + 1, d));
+                tbody.insertAdjacentHTML("beforeend", buildRowHtml(idx + 1, d, readOnly));
             });
+            document.getElementById("add-member-panel").style.display = readOnly ? "none" : "block";
+            document.getElementById("history-badge").style.display = readOnly ? "inline-block" : "none";
+            document.getElementById("back-to-current-btn").style.display = readOnly ? "inline-block" : "none";
         }
 
         function saveData() {
-            const docRef = getUserDocRef();
-            if (!docRef) return;
-            docRef.set({ rows: serializeTable(), updatedAt: new Date().toISOString() })
+            if (isViewingHistory) return; // 歷史週別唯讀，不會被覆寫
+            const docRef = getWeekDocRef(currentWeekId);
+            const root = getUserRootRef();
+            if (!docRef || !root) return;
+            const rows = serializeTable();
+            docRef.set({ rows, updatedAt: new Date().toISOString() })
                 .catch((err) => console.error("儲存失敗：", err));
+            // 同步更新名冊（姓名＋真理追求目標），做為下週新的一週的預設名單
+            root.set({ roster: rows.map((r) => ({ name: r.name, goal: r.goal })) }, { merge: true })
+                .catch((err) => console.error("名冊同步失敗：", err));
         }
 
-        function loadData() {
-            const docRef = getUserDocRef();
+        function blankRowsFromRoster(roster) {
+            return roster.map((r) => ({
+                name: r.name,
+                goal: r.goal,
+                pray: false,
+                group: false,
+                lord: false,
+                gospel: "沒有",
+                gospelTime: "",
+                extra: "",
+            }));
+        }
+
+        const DEFAULT_ROSTER = [
+            { name: "EX：王阿花", goal: "創世紀生命讀經第1章" },
+            { name: "EX：陳大頭", goal: "精讀羅馬書核心真理" },
+        ];
+
+        function initApp() {
+            computeCurrentWeek();
+            const root = getUserRootRef();
+            if (!root) return;
+
+            const weekDocRef = getWeekDocRef(currentWeekId);
+            weekDocRef.get().then((weekDoc) => {
+                if (weekDoc.exists && Array.isArray(weekDoc.data().rows)) {
+                    viewingWeekId = currentWeekId;
+                    isViewingHistory = false;
+                    renderTable(weekDoc.data().rows, false);
+                    updateWeekRangeLabel();
+                    loadWeekSelector();
+                    return;
+                }
+                // 本週還沒有紀錄 → 用名冊（或預設示範資料）建立新的一週，出席狀態全部重設為空白
+                root.get().then((rootDoc) => {
+                    const roster = (rootDoc.exists && Array.isArray(rootDoc.data().roster) && rootDoc.data().roster.length > 0)
+                        ? rootDoc.data().roster
+                        : DEFAULT_ROSTER;
+                    const newRows = blankRowsFromRoster(roster);
+                    viewingWeekId = currentWeekId;
+                    isViewingHistory = false;
+                    renderTable(newRows, false);
+                    updateWeekRangeLabel();
+                    saveData();
+                    loadWeekSelector();
+                }).catch((err) => console.error("讀取名冊失敗：", err));
+            }).catch((err) => console.error("讀取本週資料失敗：", err));
+        }
+
+        function loadWeekSelector() {
+            const root = getUserRootRef();
+            if (!root) return;
+            root.collection("weeks")
+                .orderBy(firebase.firestore.FieldPath.documentId(), "desc")
+                .limit(30)
+                .get()
+                .then((snapshot) => {
+                    const select = document.getElementById("week_selector");
+                    select.innerHTML = "";
+                    const ids = snapshot.docs.map((d) => d.id);
+                    if (!ids.includes(currentWeekId)) ids.unshift(currentWeekId);
+                    ids.sort().reverse();
+                    ids.forEach((id) => {
+                        const start = parseWeekId(id);
+                        const end = new Date(start);
+                        end.setDate(end.getDate() + 6);
+                        const label = (id === currentWeekId ? "🟢 本週　" : "") +
+                            `${formatDateDisplay(start)} ~ ${formatDateDisplay(end)}`;
+                        const opt = document.createElement("option");
+                        opt.value = id;
+                        opt.textContent = label;
+                        select.appendChild(opt);
+                    });
+                    select.value = viewingWeekId;
+                })
+                .catch((err) => console.error("讀取週別清單失敗：", err));
+        }
+
+        function onWeekSelectChange() {
+            const select = document.getElementById("week_selector");
+            switchWeek(select.value);
+        }
+
+        function switchWeek(weekId) {
+            if (weekId === currentWeekId) {
+                goToCurrentWeek();
+                return;
+            }
+            const docRef = getWeekDocRef(weekId);
             if (!docRef) return;
             docRef.get().then((doc) => {
-                if (doc.exists && Array.isArray(doc.data().rows) && doc.data().rows.length > 0) {
-                    renderTable(doc.data().rows);
+                if (doc.exists && Array.isArray(doc.data().rows)) {
+                    viewingWeekId = weekId;
+                    isViewingHistory = true;
+                    renderTable(doc.data().rows, true);
+                    updateWeekRangeLabel();
                 } else {
-                    // 這個帳號第一次使用，還沒有雲端資料，就用預設的示範資料，並立刻存一份上去
-                    saveData();
+                    alert("這一週沒有紀錄。");
                 }
-            }).catch((err) => console.error("讀取失敗：", err));
+            }).catch((err) => console.error("讀取歷史週別失敗：", err));
+        }
+
+        function goToCurrentWeek() {
+            computeCurrentWeek();
+            const docRef = getWeekDocRef(currentWeekId);
+            docRef.get().then((doc) => {
+                viewingWeekId = currentWeekId;
+                isViewingHistory = false;
+                if (doc.exists && Array.isArray(doc.data().rows)) {
+                    renderTable(doc.data().rows, false);
+                } else {
+                    initApp();
+                    return;
+                }
+                updateWeekRangeLabel();
+                const select = document.getElementById("week_selector");
+                if (select) select.value = currentWeekId;
+            }).catch((err) => console.error("讀取本週資料失敗：", err));
         }
 
         function toggleGospel(selectObj, targetId) {
