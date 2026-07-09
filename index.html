@@ -60,11 +60,27 @@
                 <button class="btn btn-dark w-100 fw-bold" onclick="handleLogin()" id="login_btn">登入</button>
             </div>
         </div>
+
+        <!-- ℹ️ 使用前說明：登入畫面直接顯示，不用另外點開 -->
+        <div class="card main-card shadow-sm rounded-3 overflow-hidden mt-3" style="max-width: 400px;">
+            <div class="card-header bg-secondary text-white py-2">
+                <h6 class="mb-0 fw-bold">ℹ️ 使用前說明</h6>
+            </div>
+            <div class="card-body p-3 bg-white small text-start">
+                <p class="fw-bold mb-1">📌 登入方式</p>
+                <p class="text-muted mb-3">本系統以「一個會所」為單位使用，建議由會所裡各區推派<b>一位代表</b>（例如服事的弟兄姊妹）統一登入、填寫。帳號密碼請自訂代號即可，<b>不需要、也請不要使用真實姓名或個人資料</b>。</p>
+                <p class="fw-bold mb-1">🎯 系統用途</p>
+                <p class="text-muted mb-3">這個系統是為了幫助召會的地區會所，將聖徒在禱告聚會、小排聚會、主日聚會、傳福音、額外分別時間等召會生活實行上的光景做整理與追蹤，讓服事的弟兄姊妹能更清楚整體情形，好照顧、扶持每一位聖徒的屬靈追求。</p>
+                <p class="fw-bold mb-1">👤 製作者</p>
+                <p class="text-muted mb-0">本系統由一位大專弟兄製作及維護。使用上若有任何問題，或有需要增加、調整的內容，歡迎聯繫（聯絡方式：待補充）。</p>
+            </div>
+        </div>
     </div>
 
     <div class="container" id="app-container" style="display:none;">
         <div class="d-flex justify-content-end mb-2" style="max-width: 950px; margin: 0 auto;">
             <span class="small text-muted me-3 align-self-center" id="current-user-label"></span>
+            <button class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#usage-modal">ℹ️ 使用說明</button>
             <button class="btn btn-sm btn-outline-secondary" onclick="handleLogout()">登出</button>
         </div>
         <div class="card main-card shadow-sm rounded-3 overflow-hidden">
@@ -205,6 +221,27 @@
         ※ 本頁面之召會生活動態追蹤大腦由 JavaScript 前端核心渲染驅動。
     </div>
        
+    <!-- ====================================================== -->
+    <!-- ℹ️ 使用說明 Modal（登入後隨時可從按鈕點開查看） -->
+    <div class="modal fade" id="usage-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h6 class="modal-title fw-bold">ℹ️ 使用前說明</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body small text-start">
+                    <p class="fw-bold mb-1">📌 登入方式</p>
+                    <p class="text-muted mb-3">本系統以「一個會所」為單位使用，建議由會所裡各區推派<b>一位代表</b>（例如服事的弟兄姊妹）統一登入、填寫。帳號密碼請自訂代號即可，<b>不需要、也請不要使用真實姓名或個人資料</b>。</p>
+                    <p class="fw-bold mb-1">🎯 系統用途</p>
+                    <p class="text-muted mb-3">這個系統是為了幫助召會的地區會所，將聖徒在禱告聚會、小排聚會、主日聚會、傳福音、額外分別時間等召會生活實行上的光景做整理與追蹤，讓服事的弟兄姊妹能更清楚整體情形，好照顧、扶持每一位聖徒的屬靈追求。</p>
+                    <p class="fw-bold mb-1">👤 製作者</p>
+                    <p class="text-muted mb-0">本系統由一位大專弟兄製作及維護。使用上若有任何問題，或有需要增加、調整的內容，歡迎聯繫（聯絡方式：待補充）。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ====================================================== -->
     <!-- JavaScript 大腦（核心增刪改查完全封裝） -->
     <!-- ====================================================== -->
